@@ -1,0 +1,49 @@
+# .gitpod.yml na raiz do seu projeto Spring Boot
+# Este arquivo é crucial para configurar seu ambiente no Gitpod.
+
+# Imagem base com Java e ferramentas comuns.
+# gitpod/workspace-full-vnc é uma boa opção por ser completa.
+image: gitpod/workspace-full-vnc
+
+tasks:
+  - name: Install Java, Maven, and Build Project
+    init: |
+      # --- Instalações Iniciais ---
+      # Atualiza a lista de pacotes
+      sudo apt-get update
+      # Instala o OpenJDK 21 se já não estiver na imagem
+      sudo apt-get install -y openjdk-21-jdk
+      # Instala o Maven se já não estiver na imagem
+      sudo apt-get install -y maven
+
+      # --- Configurações de Ambiente (JAVA_HOME e PATH) ---
+      # Adiciona JAVA_HOME e PATH ao perfil do bash para a sessão
+      # Isso garante que o Java e o Maven sejam encontrados.
+      echo 'export JAVA_HOME="/usr/lib/jvm/java-21-openjdk-amd64"' >> ~/.bashrc
+      echo 'export PATH="$JAVA_HOME/bin:$PATH"' >> ~/.bashrc
+      # Recarrega o perfil do bash para que as variáveis entrem em vigor imediatamente
+      source ~/.bashrc
+
+      # --- Construção do Projeto Maven ---
+      # Navega para a pasta do seu projeto Spring Boot
+      # ATENÇÃO: Confirme que 'delivery-api' é o nome da pasta do seu projeto principal
+      # Pode ser que o .gitpod.yml esteja na raiz do Encontro3--FAT e o projeto esteja dentro de 'delivery-api'
+      cd delivery-api # Ajuste este caminho se necessário
+      echo "Executando mvn clean install..."
+      ./mvnw clean install -DskipTests=true # Instala dependências e compila, pulando testes para mais rapidez inicial
+      echo "Maven install concluído."
+
+    command: |
+      # --- Execução da Aplicação Spring Boot ---
+      # Recarrega o perfil do bash para garantir variáveis de ambiente
+      source ~/.bashrc
+      # Navega para a pasta do seu projeto Spring Boot
+      cd delivery-api # Ajuste este caminho se necessário
+      echo "Iniciando aplicação Spring Boot..."
+      ./mvnw spring-boot:run # Inicia a aplicação Spring Boot
+ports:
+  # A porta padrão do Spring Boot
+  - port: 8080
+    onOpen: open-browser # Abre uma nova aba no navegador com sua aplicação
+    # onOpen: open-preview # Ou use open-preview para abrir no painel lateral do Gitpod
+
