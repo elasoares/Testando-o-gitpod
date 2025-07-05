@@ -5,6 +5,8 @@ import com.deliverytech.delivey_api.model.*;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,15 +19,15 @@ import com.deliverytech.delivey_api.service.RestaurantService;
 @RestController
 public class RestaurantController {
     @Autowired 
-    private RestaurantService restaurantService;
+    private RestaurantService service;
 
     @GetMapping
     public List<RestaurantDTO> getAllRestaurant(){
-        return restaurantService.findAll();
+        return service.findAll();
     }
 
     @PostMapping
-    public RestaurantDTO createRestaurant(@RequestBody Restaurant r){
-        return restaurantService.save(r);
+    public ResponseEntity<RestaurantDTO> createRestaurant(@RequestBody Restaurant r){
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.save(r));
     }
 }

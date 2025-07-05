@@ -16,19 +16,18 @@ import jakarta.transaction.Transactional;
 @Service
 public class RestaurantService {
     @Autowired
-    private RestaurantRepository restaurantRepository;
+    private RestaurantRepository repository;
 
     public List<RestaurantDTO>findAll(){
-        List<Restaurant> restaurant = restaurantRepository.findAll();
-        return restaurant.stream()
+        return repository.findAll()
+        .stream()
         .map(RestaurantDTO::new)
         .collect(Collectors.toList());
     }
 
     @Transactional
     public RestaurantDTO save(Restaurant r){
-        Restaurant saved = restaurantRepository.save(r);
-        return new RestaurantDTO(saved);
+        return new RestaurantDTO(repository.save(r));
     }
 
 
