@@ -9,12 +9,12 @@ tasks:
   # 'init' é executado uma vez, ao criar/reconstruir o ambiente
   - init: |
       echo "Executando comandos de inicialização..."
-      cd delivery-api
+      cd /workspace/Testando-o-gitpod/delivey-api
       ./mvnw clean install # Limpa e compila o projeto
     # 'command' é executado sempre que o workspace inicia
     command: |
       echo "Iniciando a aplicação Spring Boot..."
-      cd delivery-api
+      cd /workspace/Testando-o-gitpod/delivey-api
       ./mvnw spring-boot:run # Inicia sua aplicação
 
 # Define as portas que sua aplicação usa e como o Gitpod deve tratá-las

@@ -10,8 +10,8 @@ USER gitpod
 # E instala a versão 21 do OpenJDK (Temurin) e a define como padrão
 RUN curl -s "https://get.sdkman.io" | bash \
     && echo "source ~/.sdkman/bin/sdkman-init.sh" >> ~/.bashrc \
-    && source ~/.sdkman/bin/sdkman-init.sh && sdk install java 21.0.3-tem \
-    && source ~/.sdkman/bin/sdkman-init.sh && sdk default java 21.0.3-tem
+    && sdk install java 21.0.3-tem \
+    && sdk default java 21.0.3-tem
 
 # Define a variável de ambiente JAVA_HOME
 ENV JAVA_HOME="/home/gitpod/.sdkman/candidates/java/current"
