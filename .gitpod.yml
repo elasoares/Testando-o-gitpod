@@ -9,12 +9,14 @@ tasks:
   # 'init' é executado uma vez, ao criar/reconstruir o ambiente
   - init: |
       echo "Executando comandos de inicialização..."
-      cd /workspace/Testando-o-gitpod/delivey-api
+      cd /workspace/Testando-o-gitpod/deliverytech
+      sdk install java 17.0.7-tem
+      sdk use java 17.0.7-tem
       ./mvnw clean install # Limpa e compila o projeto
     # 'command' é executado sempre que o workspace inicia
     command: |
       echo "Iniciando a aplicação Spring Boot..."
-      cd /workspace/Testando-o-gitpod/delivey-api
+      cd /workspace/Testando-o-gitpod/deliverytech
       ./mvnw spring-boot:run # Inicia sua aplicação
 
 # Define as portas que sua aplicação usa e como o Gitpod deve tratá-las
@@ -22,7 +24,7 @@ ports:
   - port: 8080
     onOpen: open-browser # Abre a URL da porta 8080 automaticamente no navegador
   - port: 35729 # Para LiveReload (se estiver usando)
-  - port: 8000 # Exemplos de outras portas que você pode usar
+  - port: 8000
   - port: 8001
 
 # Sugere extensões do VS Code para o ambiente Gitpod
