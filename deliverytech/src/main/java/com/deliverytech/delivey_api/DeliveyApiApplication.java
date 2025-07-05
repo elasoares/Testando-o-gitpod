@@ -17,12 +17,4 @@ public class DeliveyApiApplication {
 
 	
 	}
-	@Bean
-    public CommandLineRunner initData(RestaurantService restaurantService) {
-        return args -> {
-             restaurantService.initializeMockDataIfEmpty(); 
-             System.out.println("Dados iniciais verificados/inseridos.");
-        };
-	}
-
 }
