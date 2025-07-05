@@ -23,6 +23,7 @@ tasks:
 ports:
   - port: 8080
     onOpen: open-browser # Abre a URL da porta 8080 automaticamente no navegador
+    visibility: public
   - port: 35729 # Para LiveReload (se estiver usando)
   - port: 8000
   - port: 8001
