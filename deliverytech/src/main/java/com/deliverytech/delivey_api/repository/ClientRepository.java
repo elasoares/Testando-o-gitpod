@@ -1,6 +1,6 @@
 package com.deliverytech.delivey_api.repository;
 
-import com.deliverytech.delivey_api.model.Client; // Importe sua classe de entidade Client
+import com.deliverytech.delivey_api.model.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
