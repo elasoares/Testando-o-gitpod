@@ -60,22 +60,13 @@ public class RestaurantController {
      * @return ResponseEntity com RestaurantDTO do restaurante encontrado e status 200 OK,
      * ou status 404 Not Found se o restaurante não existir.
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<RestaurantDTO> getRestaurantById(@PathVariable Long id) {
-        return restaurantService.findRestaurantById(id) // Busca o restaurante pelo ID
-                .map(ResponseEntity::ok) // Se encontrado, retorna 200 OK com o DTO
-                .orElse(ResponseEntity.notFound().build()); // Se não encontrado, retorna 404 Not Found
+      @GetMapping("/{id}")
+    public ResponseEntity<Restaurant> getRestaurantById(@PathVariable Long id) {
+        return restaurantService.findRestaurantById(id)
+                .map(restaurant -> new ResponseEntity<>(restaurant, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    /**
-     * Endpoint para buscar todos os restaurantes que estão ativos.
-     * GET /api/v1/restaurants/active
-     * @return Lista de RestaurantDTOs de restaurantes ativos.
-     */
-    @GetMapping("/active")
-    public List<RestaurantDTO> getActiveRestaurants() {
-        return restaurantService.findActiveRestaurants();
-    }
 
     /**
      * Endpoint para atualizar os dados de um restaurante existente.
@@ -99,29 +90,7 @@ public class RestaurantController {
         }
     }
 
-    /**
-     * Endpoint para inativar um restaurante.
-     * PATCH /api/v1/restaurants/{id}/deactivate
-     * @param id ID do restaurante a ser inativado.
-     * @return ResponseEntity com status 204 No Content se inativado com sucesso, false caso contrário (se não encontrado ou já inativo).
-     */
-    @PatchMapping("/{id}/deactivate")
-    public ResponseEntity<Void> deactivateRestaurant(@PathVariable Long id) {
-        boolean deactivated = restaurantService.deactivateRestaurant(id);
-        return deactivated ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
-    }
 
-    /**
-     * Endpoint para ativar um restaurante.
-     * PATCH /api/v1/restaurants/{id}/activate
-     * @param id ID do restaurante a ser ativado.
-     * @return ResponseEntity com status 204 No Content se ativado com sucesso, false caso contrário (se não encontrado ou já ativo).
-     */
-    @PatchMapping("/{id}/activate")
-    public ResponseEntity<Void> activateRestaurant(@PathVariable Long id) {
-        boolean activated = restaurantService.activateRestaurant(id);
-        return activated ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
-    }
 
     /**
      * Endpoint para deletar um restaurante.

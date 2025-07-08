@@ -11,7 +11,7 @@ import com.deliverytech.delivey_api.model.Client;
 import com.deliverytech.delivey_api.model.ClientDTO;
 import com.deliverytech.delivey_api.repository.ClientRepository;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ClientService {
@@ -20,98 +20,97 @@ public class ClientService {
 
     @Transactional
     public ClientDTO createClient(Client client){
-        if(repository.findByEmail(client.getEmail()).isPresent()){
-            throw new IllegalArgumentException("E-mail já cadastrado: " + client.getEmail());
-        }
         client.setActive(true);
         Client savedClient = repository.save(client);
         return new ClientDTO(savedClient);
     }
 
+    @Transactional
     public List<ClientDTO>findAllClients(){
         return repository.findAll().stream()
                 .map(ClientDTO::new)
                 .collect(Collectors.toList());
     }
 
-    /*  O uso do Optional<ClientDTO> ajuda a retornar um ClientDTO (se o ID existir no banco),
-        🔹 Ou pode não retornar nada (se o ID não existir).
-        É uma forma segura de evitar null e forçar quem chama o método a tratar o 
-        caso de “cliente não encontrado”. */
-    public Optional<ClientDTO> findClientById(Long id){
+    /* O uso do Optional<ClientDTO> ajuda a retornar um ClientDTO (se o ID existir no banco),
+     * Ou pode não retornar nada (se o ID não existir).
+     * É uma forma segura de evitar null e forçar quem chama o método a tratar o
+     * caso de “cliente não encontrado”.
+     * >>> This method is good for API exposure, but not for internal service logic that needs the entity. <<<
+     */
+    @Transactional(readOnly = true)
+    public Optional<ClientDTO> findClientDTOById(Long id){ 
         return repository.findById(id)
                 .map(ClientDTO::new);
     }
 
-  /*   public Optional<ClientDTO> findClientById(Long id) {
-        Optional<Client> optionalClient = repository.findById(id);
 
-        if (optionalClient.isPresent()) {
-            Client client = optionalClient.get();
-            List<ClientDTO> list = List.of(new ClientDTO(client)); // cria uma lista com um item
+    @Transactional(readOnly = true)
+    public Optional<Client> findClientById(Long id) { 
+        return repository.findById(id);
+    }
+   
 
-            for (ClientDTO dto : list) {
-                return Optional.of(dto); // retorna o DTO dentro do Optional
-            }
+
+        @Transactional
+        public Optional<Client> updateClient(Long id, Client updatedClient) { 
+            return repository.findById(id)
+                    .map(client -> {
+                        client.setName(updatedClient.getName());
+                        client.setEmail(updatedClient.getEmail());
+                        client.setPhoneNumber(updatedClient.getPhoneNumber());
+
+                        if (updatedClient.getPassword() != null && !updatedClient.getPassword().isEmpty()) {
+                            client.setPassword(updatedClient.getPassword()); 
+                        }
+                        if (updatedClient.getDeliveryAddress() != null && !updatedClient.getDeliveryAddress().isEmpty()) {
+                            client.setDeliveryAddress(updatedClient.getDeliveryAddress());
+                        }
+                        client.setActive(updatedClient.isActive()); 
+
+                        return repository.save(client);
+                    });
         }
 
-        return Optional.empty(); // se não achou o client
-    } */
-
-    public Optional<ClientDTO>findClientByEmail(String email){
-        return repository.findByEmail(email)
-                .map(ClientDTO::new);
-    }
-
-
-    @Transactional
-    public Optional<ClientDTO> updateClient(Long id, Client updatedClient){
-        return repository.findById(id).map(client ->{
-            if(!client.getEmail().equals(updatedClient.getEmail()) && repository.findByEmail(updatedClient.getEmail()).isPresent()){
-                throw new IllegalArgumentException("O novo e-mail já está em uso por outro cliente: " + updatedClient.getEmail());
-            }
-            client.setName(updatedClient.getName());
-            client.setEmail(updatedClient.getEmail());
-            client.setTelephone(updatedClient.getTelephone());
-            Client savedClient = repository.save(client);
-            return new ClientDTO(savedClient);
-        });
-    }
-
-    @Transactional
-    public boolean desableClient(Long id){
-        return repository.findById(id).map(client ->{
-            if(client.isActive()){
-                client.setActive(false);
-                repository.save(client);
-                return true;
-            }
-            return false;
-        }).orElse(false);
-    }
-
-    @Transactional
-    public boolean activeClient(Long id){
-        return repository.findById(id).map(client->{
-            if(!client.isActive()){
-                client.setActive(true);
-                repository.save(client);
-                return true;
-            }
-            return false;
-        }).orElse(false);
-    }
 
     @Transactional
     public void initializeMockDataIfEmpty(){
-        if(repository.count() == 0){
-            createClient(new Client("Ana", "ana@gmail.com", "1111-1111", true));
-            createClient(new Client("Pedro", "pedro@gmail.com", "2222-2222", false));
-            createClient(new Client("Elaine", "elaine@gmail.com", "3333-3333", true));
-        }else{
-            System.out.println("Banco H2 já possui dados cadastrados.");
-        }
+    if(repository.count() == 0){
+        System.out.println("SERVICE: Clientes iniciais inseridos: " + repository.count());
+
+        createClient(Client.builder()
+            .name("Ana")
+            .email("ana@gmail.com")
+            .password("hashed_password_ana")
+            .phoneNumber("1111-1111")
+            .deliveryAddress("Rua das Oliveiras, 10")
+            .active(true)
+            .build());
+
+        createClient(Client.builder()
+            .name("Pedro")
+            .email("pedro@gmail.com")
+            .password("hashed_password_pedro")
+            .phoneNumber("2222-2222")
+            .deliveryAddress("Av. Central, 250")
+            .active(false)
+            .build());
+
+        createClient(Client.builder()
+            .name("Elaine")
+            .email("elaine@gmail.com")
+            .password("hashed_password_elaine")
+            .phoneNumber("3333-3333")
+            .deliveryAddress("Travessa dos Sonhos, 5")
+            .active(true)
+            .build());
+
+        System.out.println("SERVICE: Clientes iniciais inseridos: " + repository.count());
+    } else {
+        System.out.println("SERVICE: Banco H2 já possui dados cadastrados, pulando inicialização de clientes mock.");
     }
+}
+  
     @Transactional
     public boolean deleteClient(Long id){
         if(repository.existsById(id)){

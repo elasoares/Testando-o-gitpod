@@ -1,5 +1,7 @@
 package com.deliverytech.delivey_api.model;
 
+import java.math.BigDecimal;
+
 import lombok.*;
 
 @Data 
@@ -10,7 +12,7 @@ public class ProductDTO {
     private String name;
     private String description;
     private String category;
-    private Double price;
+    private BigDecimal price;
     private boolean available;
     private Long restaurantId;
     

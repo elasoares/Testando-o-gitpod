@@ -9,7 +9,8 @@ import java.util.Optional;
 
 @Repository
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
-    Optional<Restaurant> findByName(String name); // Para validação de nome único
-    List<Restaurant> findByActiveTrue(); // Para buscar restaurantes ativos
-    List<Restaurant> findByActiveFalse(); // Para buscar restaurantes inativos
+    Optional<Restaurant> findByNameIgnoreCase(String name);
+   /*  Optional<Restaurant> findByName(String name); 
+    List<Restaurant> findByActiveTrue(); 
+    List<Restaurant> findByActiveFalse();  */
 }

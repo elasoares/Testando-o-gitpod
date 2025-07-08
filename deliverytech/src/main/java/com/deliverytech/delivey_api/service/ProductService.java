@@ -3,14 +3,13 @@ package com.deliverytech.delivey_api.service;
 import com.deliverytech.delivey_api.exception.ResourceNotFoundException;
 import com.deliverytech.delivey_api.model.Product;
 import com.deliverytech.delivey_api.model.ProductDTO;
-import com.deliverytech.delivey_api.model.Restaurant; // Importe a entidade Restaurant
+import com.deliverytech.delivey_api.model.Restaurant; // Keep this import for the entity
 import com.deliverytech.delivey_api.repository.ProductRepository;
-import com.deliverytech.delivey_api.repository.RestaurantRepository; // Importe o RestaurantRepository
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Importe este
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,37 +21,38 @@ public class ProductService {
     private ProductRepository productRepository;
 
     @Autowired
-    private RestaurantRepository restaurantRepository; // Injeta o repositório de Restaurante
+    private RestaurantService restaurantService; // This is the correct way to inject and use the service
 
     /**
-     * Cadastra um novo produto para um restaurante específico.
-     * Realiza validações de preço, nome único para o restaurante e existência do restaurante.
+     * Registers a new product for a specific restaurant.
+     * Performs validations for price, unique name for the restaurant, and restaurant existence.
      *
-     * @param product O objeto Product a ser cadastrado.
-     * @param restaurantId O ID do restaurante ao qual o produto pertence.
-     * @return ProductDTO do produto cadastrado.
-     * @throws IllegalArgumentException Se o preço for inválido, o nome já existir para o restaurante.
-     * @throws ResourceNotFoundException Se o restaurante não for encontrado.
+     * @param product The Product object to be registered.
+     * @param restaurantId The ID of the restaurant to which the product belongs.
+     * @return ProductDTO of the registered product.
+     * @throws IllegalArgumentException If the price is invalid, or the name already exists for the restaurant.
+     * @throws ResourceNotFoundException If the restaurant is not found.
      */
     @Transactional
     public ProductDTO createProduct(Product product, Long restaurantId) {
-        // 1. Validação de preço
-        if (product.getPrice() == null || product.getPrice() <= 0) {
+        // 1. Price validation
+        if (product.getPrice() == null || product.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("O preço do produto deve ser positivo.");
         }
 
-        // 2. Verificar existência do restaurante
-        Restaurant restaurant = restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new IllegalArgumentException("Restaurante com ID " + restaurantId + " não encontrado."));
+        // 2. Verify restaurant existence using the service to get the entity
+        Restaurant restaurant = restaurantService.findRestaurantById(restaurantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurante com ID " + restaurantId + " não encontrado."));
 
-        // 3. Validação de nome único por restaurante
+        // 3. Unique name validation per restaurant
+        // Assuming findByRestaurantIdAndNameIgnoreCase is in ProductRepository
         if (productRepository.findByRestaurantIdAndNameIgnoreCase(restaurantId, product.getName()).isPresent()) {
             throw new IllegalArgumentException("Já existe um produto com o nome '" + product.getName() + "' neste restaurante.");
         }
 
-        // Associa o produto ao restaurante
+        // Associate the product with the restaurant
         product.setRestaurant(restaurant);
-        // Define a disponibilidade padrão para true ao cadastrar
+        // Set default availability to true when registering
         product.setAvailable(true);
 
         Product savedProduct = productRepository.save(product);
@@ -60,123 +60,125 @@ public class ProductService {
     }
 
     /**
-     * Busca um produto pelo ID.
-     * @param id ID do produto.
-     * @return Optional de ProductDTO. Empty se não encontrado.
+     * Finds a product by ID.
+     * @param id Product ID.
+     * @return 
      */
-    public Optional<ProductDTO> findProductById(Long id) {
-        return productRepository.findById(id)
-                .map(ProductDTO::new);
-    }
-
-    /**
-     * Busca todos os produtos de um restaurante específico.
-     * @param restaurantId ID do restaurante.
-     * @return Lista de ProductDTOs dos produtos do restaurante.
-     * @throws ResourceNotFoundException Se o restaurante não for encontrado.
-     */
-    public List<ProductDTO> findProductsByRestaurant(Long restaurantId) {
-        if (!restaurantRepository.existsById(restaurantId)) {
-            throw new IllegalArgumentException("Restaurante com ID " + restaurantId + " não encontrado.");
+        @Transactional(readOnly = true)
+        public Optional<Product> findProductById(Long id) { 
+            return productRepository.findById(id);
         }
-        return productRepository.findByRestaurantId(restaurantId).stream()
-                .map(ProductDTO::new)
-                .collect(Collectors.toList());
-    }
 
-    /**
-     * Busca todos os produtos disponíveis de um restaurante específico.
-     * @param restaurantId ID do restaurante.
-     * @return Lista de ProductDTOs dos produtos disponíveis do restaurante.
-     * @throws ResourceNotFoundException Se o restaurante não for encontrado.
-     */
-    public List<ProductDTO> findAvailableProductsByRestaurant(Long restaurantId) {
-        if (!restaurantRepository.existsById(restaurantId)) {
-            throw new IllegalArgumentException("Restaurante com ID " + restaurantId + " não encontrado.");
+        @Transactional(readOnly = true)
+        public Optional<ProductDTO> findProductDTOById(Long id) { 
+            return productRepository.findById(id)
+                    .map(ProductDTO::new);
         }
-        return productRepository.findByRestaurantIdAndAvailableTrue(restaurantId).stream()
-                .map(ProductDTO::new)
-                .collect(Collectors.toList());
-    }
+
 
     /**
-     * Atualiza os dados de um produto existente.
-     * @param id ID do produto a ser atualizado.
-     * @param updatedProduct Objeto Product com os dados atualizados.
-     * @return Optional de ProductDTO do produto atualizado. Empty se o produto não for encontrado.
-     * @throws IllegalArgumentException Se o preço for inválido, ou o nome já existir para outro produto no mesmo restaurante.
+     * Updates an existing product's data.
+     * @param id Product ID to be updated.
+     * @param updatedProduct Product object with updated data.
+     * @return Optional of ProductDTO of the updated product. Empty if the product is not found.
+     * @throws IllegalArgumentException If the price is invalid, or the name already exists for another product in the same restaurant.
+     * @throws ResourceNotFoundException If the product to be updated is not found.
      */
     @Transactional
     public Optional<ProductDTO> updateProduct(Long id, Product updatedProduct) {
-        // Validação de preço
-        if (updatedProduct.getPrice() == null || updatedProduct.getPrice() <= 0) {
+        // Price validation - Corrected for BigDecimal
+        if (updatedProduct.getPrice() == null || updatedProduct.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("O preço do produto deve ser positivo.");
         }
 
         return productRepository.findById(id).map(existingProduct -> {
-            // Validação de nome único para o mesmo restaurante, exceto para o próprio produto
+            // Unique name validation for the same restaurant, excluding the product itself
+            // Assuming findByRestaurantIdAndNameIgnoreCase is in ProductRepository
             Optional<Product> productWithSameName = productRepository.findByRestaurantIdAndNameIgnoreCase(existingProduct.getRestaurant().getId(), updatedProduct.getName());
             if (productWithSameName.isPresent() && !productWithSameName.get().getId().equals(id)) {
                 throw new IllegalArgumentException("Já existe outro produto com o nome '" + updatedProduct.getName() + "' neste restaurante.");
             }
 
-            // Atualiza os campos
+            // Update fields
             existingProduct.setName(updatedProduct.getName());
             existingProduct.setDescription(updatedProduct.getDescription());
             existingProduct.setPrice(updatedProduct.getPrice());
             existingProduct.setCategory(updatedProduct.getCategory());
-            // A disponibilidade será atualizada por um método separado para clareza
+            // Availability will be updated by a separate method for clarity
 
             Product savedProduct = productRepository.save(existingProduct);
             return new ProductDTO(savedProduct);
         });
     }
 
-    /**
-     * Define a disponibilidade de um produto.
-     * @param id ID do produto.
-     * @param available Status de disponibilidade (true para disponível, false para indisponível).
-     * @return True se a disponibilidade foi atualizada, false se o produto não foi encontrado.
-     */
-    @Transactional
-    public boolean setProductAvailability(Long id, boolean available) {
-        return productRepository.findById(id).map(product -> {
-            if (product.isAvailable() != available) { // Só atualiza se o status for diferente
-                product.setAvailable(available);
-                productRepository.save(product);
-                return true;
-            }
-            return false; // Status já era o desejado
-        }).orElse(false); // Produto não encontrado
-    }
+   
 
     /**
-     * Deleta um produto pelo ID.
-     * @param id ID do produto a ser deletado.
-     * @throws ResourceNotFoundException Se o produto não for encontrado.
+     * Deletes a product by ID.
+     * @param id Product ID to be deleted.
+     * @throws ResourceNotFoundException If the product is not found.
      */
     @Transactional
     public void deleteProduct(Long id) {
         if (!productRepository.existsById(id)) {
-            throw new IllegalArgumentException("Produto com ID " + id + " não encontrado para deleção.");
+            throw new ResourceNotFoundException("Produto com ID " + id + " não encontrado para deleção.");
         }
         productRepository.deleteById(id);
     }
 
-    // Método de inicialização de dados (para desenvolvimento/testes com H2)
+    // Method for data initialization (for development/testing with H2)
     @Transactional
     public void initializeMockDataIfEmpty() {
-        if (restaurantRepository.count() == 0) {
-             System.out.println("SERVICE: Criando restaurante mock para produtos...");
-             Restaurant mockRestaurant = restaurantRepository.save(new Restaurant(null, "Mock Restaurante Pizzaria", "Rua Mock, 123", "9999-0000", 4.5, true, new ArrayList<>()));
-             System.out.println("SERVICE: Restaurante mock criado com ID: " + mockRestaurant.getId());
-             // Salvar produtos usando o service para validar e associar
-             createProduct(new Product("Pizza Calabresa", "Massa fina, calabresa, cebola, mussarela", "Pizza", 45.00, true ), mockRestaurant.getId());
-             createProduct(new Product("Refrigerante Cola", "Lata 350ml", "Bebida", 7.00, true ), mockRestaurant.getId());
-             createProduct(new Product("Brownie com Sorvete", "Brownie caseiro com bola de sorvete de creme", "Sobremesa", 22.50, true), mockRestaurant.getId());
-             System.out.println("SERVICE: Produtos iniciais inseridos para o Restaurante: " + mockRestaurant.getName());
+        // You can check if there are ALREADY PRODUCTS, instead of restaurants, or add more logic.
+        // It's ideal that RestaurantService.initializeMockDataIfEmpty() is called BEFORE this one,
+        // to ensure restaurants exist.
+        if (productRepository.count() == 0) { // Check if products already exist
+            System.out.println("SERVICE: Criando dados iniciais de produtos...");
+
+            // Ensure the restaurant exists before associating products
+            // This assumes initializeMockDataIfEmpty from RestaurantService has already run.
+            // For a robust test environment, it would be better to search for the restaurant by a known name or ID.
+            // In ProductService.java's initializeMockDataIfEmpty()
+    Restaurant mockRestaurant = restaurantService.findRestaurantById(1L)
+        .orElseGet(() -> {
+            System.out.println("SERVICE: Restaurante mock padrão (ID 1) não encontrado, criando um novo...");
+            // 1. Create the new Restaurant entity using its builder
+            Restaurant newMockRestaurant = Restaurant.builder()
+                .name("Pizzaria Dev Automática")
+                .address("Rua dos Testes, 1")
+                .phoneNumber("9999-1111")
+                .rating(4.0)
+                .active(true)
+                .build();
+            // 2. IMPORTANT: Return the result of saving this new entity.
+            //    restaurantService.saveRestaurant MUST return a Restaurant entity.
+            return restaurantService.saveRestaurant(newMockRestaurant); // <--- This line must return a Restaurant
+        });
+
+            // Use the builder to create products and associate them with the restaurant
+            // Note that the product 'id' is null; it will be automatically generated.
+            // The 'restaurant' needs to be the complete entity.
+           createProduct(Product.builder()
+            .name("Pizza Calabresa Teste")
+            .description("Massa fina, calabresa, cebola, mussarela")
+            .category("Pizza")
+            .price(new BigDecimal("45.00"))
+            .available(true)
+            .restaurant(mockRestaurant) // Correctly associating the Product with the Restaurant entity
+            .build(), mockRestaurant.getId());
+
+            createProduct(Product.builder()
+                .name("Refrigerante Cola Teste")
+                .description("Lata 350ml")
+                .category("Bebida")
+                .price(new BigDecimal("7.00")) // Use BigDecimal constructor
+                .available(true)
+                .restaurant(mockRestaurant)
+                .build(), mockRestaurant.getId());
+
+            System.out.println("SERVICE: Produtos iniciais inseridos para o Restaurante: " + mockRestaurant.getName());
         } else {
-             System.out.println("SERVICE: Restaurantes já existem, pulando criação de produtos mock.");
+            System.out.println("SERVICE: Banco de dados H2 já possui produtos, pulando inicialização de produtos mock.");
         }
     }
 }

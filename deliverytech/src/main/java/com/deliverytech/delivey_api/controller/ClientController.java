@@ -56,36 +56,26 @@ public class ClientController {
      @GetMapping("/{id}")
     public ResponseEntity<ClientDTO> findClientById(@PathVariable Long id){
         return clientService.findClientById(id)
-        .map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
+        .map(client -> new ResponseEntity<>(new ClientDTO(client), HttpStatus.OK))
+        .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
     
     /* PUT /clientes/{id}, */
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id, @RequestBody Client client){
-        try{
-            return clientService.updateClient(id, client)
-                    .map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.notFound().build());
-        }catch(IllegalArgumentException e){
-            System.out.println("Error ao atualizar cliente: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-    }
-     /* PATCH /clientes/{id}, */
-    @PatchMapping("/{id}/desable")
-    public ResponseEntity<Void> desableClient(@PathVariable Long id ){
-        boolean desalbe = clientService.desableClient(id);
-        return desalbe ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
-    }
+// In ClientController.java
 
-     /* PATCH /clientes/{id}, */
-    @PatchMapping("/{id}/activate")
-    public ResponseEntity<Void>activateClient(@PathVariable Long id){
-        boolean activate = clientService.activeClient(id);
-        return activate ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
-    }
+@PutMapping("/{id}")
+public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id, @RequestBody ClientDTO updatedDto) {
+    Client clientToUpdate = new Client();
+    clientToUpdate.setName(updatedDto.getName());
+    clientToUpdate.setEmail(updatedDto.getEmail());
+    clientToUpdate.setPhoneNumber(updatedDto.getPhoneNumber());
+    
+    // 2. Call the service method with the entity
+    return clientService.updateClient(id, clientToUpdate) // Pass the clientToUpdate entity here
+            .map(updatedClient -> new ResponseEntity<>(new ClientDTO(updatedClient), HttpStatus.OK)) // Convert updated entity back to DTO
+            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND)); // Handle not found scenario
+}
 
     
     /*  DELETE /clientes/{id}   */

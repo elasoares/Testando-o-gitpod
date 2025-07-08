@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
 
 @Entity
 @Data
@@ -17,11 +19,11 @@ public class CostumerOrder {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "cliente_id")
-    private Client cliente;
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
 
     @ManyToOne
-    @JoinColumn(name = "restaurante_id")
+    @JoinColumn(name = "restaurante_id", nullable = false)
     private Restaurant restaurant;
 
     private BigDecimal total;
@@ -29,10 +31,10 @@ public class CostumerOrder {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
-    private LocalDateTime dateOrder = LocalDateTime.now();
+    private LocalDateTime orderDate = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> item;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items = new ArrayList<>();
 
     @Embedded
     private Address deliveryAddress;

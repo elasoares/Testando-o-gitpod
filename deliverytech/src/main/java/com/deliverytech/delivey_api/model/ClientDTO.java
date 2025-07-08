@@ -12,7 +12,7 @@ public class ClientDTO {
     private Long id;
     private String name;
     private String email;
-    private String telephone;
+    private String phoneNumber;
     private boolean active; 
 
  
@@ -20,14 +20,14 @@ public class ClientDTO {
         this.id = c.getId();
         this.name = c.getName();
         this.email = c.getEmail();
-        this.telephone = c.getTelephone();
+        this.phoneNumber = c.getPhoneNumber();
         this.active = c.isActive(); 
     }
 
-    public ClientDTO(String name, String email, String telephone, boolean active) {
+    public ClientDTO(String name, String email, String phoneNumber, boolean active) {
         this.name = name;
         this.email = email;
-        this.telephone = telephone;
+        this.phoneNumber = phoneNumber;
         this.active = active;
     }
 }

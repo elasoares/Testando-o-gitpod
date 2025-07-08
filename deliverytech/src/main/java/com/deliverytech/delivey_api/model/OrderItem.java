@@ -15,14 +15,14 @@ public class OrderItem {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "costumerOrder_id")
+    @JoinColumn(name = "costumerOrder_id", nullable = false)
     private CostumerOrder order;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
     private Integer amount;
 
-    private BigDecimal unitPriceDecimal;
+    private BigDecimal unitPrice;
 } 

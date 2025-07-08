@@ -1,5 +1,7 @@
 package com.deliverytech.delivey_api.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -7,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +18,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,14 +26,14 @@ public class Product {
     private String name;
     private String description;
     private String category;
-    private Double price;
+    private BigDecimal price;
     private boolean available;
 
     @ManyToOne
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
-   public Product(String name, String description, String category, double price, boolean available) {
+   public Product(String name, String description, String category, BigDecimal price, boolean available) {
         this.name = name;
         this.description = description;
         this.category = category;

@@ -11,11 +11,11 @@ import java.util.Optional;
 public interface ClientRepository extends JpaRepository<Client, Long> {
 
     
-    Optional<Client> findByEmail(String email);
+  /*   Optional<Client> findByEmail(String email);
 
     List<Client> findByActiveTrue();
 
     List<Client> findByActiveFalse();
 
-    Optional<Client> findByEmailAndActiveTrue(String email);
+    Optional<Client> findByEmailAndActiveTrue(String email); */
 }

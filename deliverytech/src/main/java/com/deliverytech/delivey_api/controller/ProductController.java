@@ -58,51 +58,14 @@ public class ProductController {
      @return ResponseEntity com ProductDTO do produto encontrado e status 200 OK,
      * ou status 404 Not Found se o produto não existir.
      */
-    @GetMapping("/products/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
-        return productService.findProductById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-    
+    return productService.findProductById(id) 
+            .map(product -> new ResponseEntity<>(new ProductDTO(product), HttpStatus.OK)) 
+            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+}
 
-    /**
-     * Endpoint para buscar todos os produtos de um restaurante específico.
-     * GET /api/v1/restaurants/{restaurantId}/products
-     *
-     * @param restaurantId ID do restaurante.
-     * @return Lista de ProductDTOs dos produtos do restaurante.
-     * @throws HttpStatus.NOT_FOUND (404) Se o restaurante não for encontrado.
-     */
-    @GetMapping("/restaurants/{restaurantId}/products")
-    public ResponseEntity<List<ProductDTO>> getProductsByRestaurant(@PathVariable Long restaurantId) {
-        try {
-            List<ProductDTO> products = productService.findProductsByRestaurant(restaurantId);
-            return ResponseEntity.ok(products);
-        } catch (ResourceNotFoundException e) {
-            // Captura o caso onde o restaurante não existe
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
 
-    /**
-     * Endpoint para buscar todos os produtos DISPONÍVEIS de um restaurante específico.
-     * GET /api/v1/restaurants/{restaurantId}/products/available
-     *
-     * @param restaurantId ID do restaurante.
-     * @return Lista de ProductDTOs dos produtos disponíveis do restaurante.
-     * @throws HttpStatus.NOT_FOUND (404) Se o restaurante não for encontrado.
-     */
-    @GetMapping("/restaurants/{restaurantId}/products/available")
-    public ResponseEntity<List<ProductDTO>> getAvailableProductsByRestaurant(@PathVariable Long restaurantId) {
-        try {
-            List<ProductDTO> products = productService.findAvailableProductsByRestaurant(restaurantId);
-            return ResponseEntity.ok(products);
-        } catch (ResourceNotFoundException e) {
-            // Captura o caso onde o restaurante não existe
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
 
     /**
      * Endpoint para atualizar os dados de um produto existente.
@@ -126,20 +89,7 @@ public class ProductController {
         }
     }
 
-    /**
-     * Endpoint para definir a disponibilidade de um produto.
-     * PATCH /api/v1/products/{id}/availability
-     *
-     * @param id        ID do produto.
-     * @param available Status de disponibilidade (true para disponível, false para indisponível).
-     * @return ResponseEntity com status 204 No Content se atualizado, ou 404 Not Found se o produto não existir.
-     */
-    @PatchMapping("/products/{id}/availability")
-    public ResponseEntity<Void> setProductAvailability(@PathVariable Long id, @RequestParam boolean available) {
-        boolean updated = productService.setProductAvailability(id, available);
-        return updated ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
-    }
-
+  
     /**
      * Endpoint para deletar um produto.
      * DELETE /api/v1/products/{id}
