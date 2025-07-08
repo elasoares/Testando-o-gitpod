@@ -1,4 +1,4 @@
-package com.deliverytech.delivey_api;
+/* package com.deliverytech.delivey_api;
 
 import com.deliverytech.delivey_api.service.ClientService;
 import com.deliverytech.delivey_api.service.ProductService; // Novo
@@ -34,3 +34,4 @@ public class AppStartupRunner implements CommandLineRunner {
     }
 }
 
+ */

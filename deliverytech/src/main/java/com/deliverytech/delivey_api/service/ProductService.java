@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional; // Importe este
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -167,7 +168,7 @@ public class ProductService {
     public void initializeMockDataIfEmpty() {
         if (restaurantRepository.count() == 0) {
              System.out.println("SERVICE: Criando restaurante mock para produtos...");
-             Restaurant mockRestaurant = restaurantRepository.save(new Restaurant(null, "Mock Restaurante Pizzaria", "Rua Mock, 123", "9999-0000", 4.5, true));
+             Restaurant mockRestaurant = restaurantRepository.save(new Restaurant(null, "Mock Restaurante Pizzaria", "Rua Mock, 123", "9999-0000", 4.5, true, new ArrayList<>()));
              System.out.println("SERVICE: Restaurante mock criado com ID: " + mockRestaurant.getId());
              // Salvar produtos usando o service para validar e associar
              createProduct(new Product("Pizza Calabresa", "Massa fina, calabresa, cebola, mussarela", "Pizza", 45.00, true ), mockRestaurant.getId());

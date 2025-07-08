@@ -1,9 +1,13 @@
 package com.deliverytech.delivey_api.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -22,21 +26,7 @@ public class Restaurant {
     private Double rating; 
     private boolean active; 
 
-    // Construtor para facilitar a criação sem ID (para o service)
-    public Restaurant(String name, String address, String phoneNumber, Double rating, boolean active) {
-        this.name = name;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.rating = rating;
-        this.active = active;
-    }
 
-    // Construtor para o initializeMockDataIfEmpty para evitar o rating e active no construtor
-    public Restaurant(String name, String address, String phoneNumber) {
-        this.name = name;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.rating = 0.0; // Valor padrão
-        this.active = true; // Valor padrão
-    }
+    @OneToMany(mappedBy = "restaurant")
+    List<Product>products = new ArrayList<>();
 }

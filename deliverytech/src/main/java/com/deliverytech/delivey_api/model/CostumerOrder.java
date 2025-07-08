@@ -31,7 +31,7 @@ public class CostumerOrder {
 
     private LocalDateTime dateOrder = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> item;
 
     @Embedded

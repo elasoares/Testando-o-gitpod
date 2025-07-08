@@ -1,5 +1,6 @@
 package com.deliverytech.delivey_api.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -156,9 +157,9 @@ public class RestaurantService {
         if (repository.count() == 0) {
             System.out.println("SERVICE: Inserindo dados iniciais de Restaurantes no H2...");
             // Usar o método createRestaurant do próprio service para garantir validações
-            createRestaurant(new Restaurant("Pizzaria Dev", "Rua das Flores, 100", "11987654321", 4.8, true));
-            createRestaurant(new Restaurant("Burger Code", "Avenida dos Dados, 200", "22912345678", 4.5, true));
-            createRestaurant(new Restaurant("Cantina Java", "Travessa do Loop, 300", "33998765432", 4.2, false)); // Inativo
+            createRestaurant(new Restaurant(null, "Pizzaria Dev", "Rua das Flores, 100", "11987654321", 4.8, true, new ArrayList<>()));
+            createRestaurant(new Restaurant(null, "Burger Code", "Avenida dos Dados, 200", "22912345678", 4.5, true, new ArrayList<>()));
+            createRestaurant(new Restaurant(null, "Cantina Java", "Travessa do Loop, 300", "33998765432", 4.2, false, new ArrayList<>())); // Inativo
             System.out.println("SERVICE: Restaurantes iniciais inseridos: " + repository.count());
         } else {
             System.out.println("SERVICE: Banco de dados H2 já possui restaurantes, pulando inicialização.");
