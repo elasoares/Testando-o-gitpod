@@ -10,6 +10,8 @@ import java.util.List;
 
 
 public interface CostumerOrderRepository extends JpaRepository<CostumerOrder, Long> {
-    List<CostumerOrder> findByClient(Client client);
-    List<CostumerOrder> findByClientStatus(Client client, OrderStatus status);
+     List<CostumerOrder> findByClientAndStatus(Client client, OrderStatus status);
+
+    List<CostumerOrder> findByClientId(Long clientId); 
+    List<CostumerOrder> findByStatus(OrderStatus status);
 }

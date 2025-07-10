@@ -54,7 +54,7 @@ public class ProductController {
      * Endpoint para buscar um produto pelo seu ID global.
      * GET /api/v1/products/{id}
      *
-        @param id ID do produto.
+     @param id ID do produto.
      @return ResponseEntity com ProductDTO do produto encontrado e status 200 OK,
      * ou status 404 Not Found se o produto não existir.
      */
@@ -63,7 +63,12 @@ public class ProductController {
     return productService.findProductById(id) 
             .map(product -> new ResponseEntity<>(new ProductDTO(product), HttpStatus.OK)) 
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-}
+    }
+
+    @GetMapping("/restaurants/products")
+    public List<Product> getProductAll() {
+    return productService.findProductALl();
+    }
 
 
 

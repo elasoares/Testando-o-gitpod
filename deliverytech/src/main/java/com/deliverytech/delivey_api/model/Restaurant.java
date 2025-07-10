@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.deliverytech.delivey_api.model.Product.ProductBuilder;
+import com.deliverytech.delivey_api.validation.ValidTelephone;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;

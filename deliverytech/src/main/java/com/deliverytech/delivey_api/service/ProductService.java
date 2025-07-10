@@ -59,14 +59,14 @@ public class ProductService {
         return new ProductDTO(savedProduct);
     }
 
-    /**
-     * Finds a product by ID.
-     * @param id Product ID.
-     * @return 
-     */
+   
         @Transactional(readOnly = true)
         public Optional<Product> findProductById(Long id) { 
             return productRepository.findById(id);
+        }
+        @Transactional(readOnly = true)
+        public List<Product> findProductALl() { 
+            return productRepository.findAll();
         }
 
         @Transactional(readOnly = true)
