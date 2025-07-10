@@ -3,6 +3,9 @@ package com.deliverytech.delivey_api.controller;
 import com.deliverytech.delivey_api.model.Restaurant;
 import com.deliverytech.delivey_api.model.RestaurantDTO;
 import com.deliverytech.delivey_api.service.RestaurantService;
+
+import jakarta.validation.Valid;
+
 import com.deliverytech.delivey_api.exception.ResourceNotFoundException; // Importe sua exceção
 
 import org.springframework.http.HttpStatus;
@@ -31,9 +34,14 @@ public class RestaurantController {
      * ou status 409 Conflict se o nome já estiver em uso.
      */
     @PostMapping
-    public ResponseEntity<RestaurantDTO> createRestaurant(@RequestBody Restaurant restaurant) {
+    public ResponseEntity<RestaurantDTO> createRestaurant(@Valid @RequestBody RestaurantDTO restaurantDTO) {
         try {
-            // Chamada ao método createRestaurant no serviço
+            Restaurant restaurant = new Restaurant();
+            restaurant.setName(restaurantDTO.getName());
+            restaurant.setAddress(restaurantDTO.getAddress());
+            restaurant.setPhoneNumber(restaurantDTO.getPhoneNumber());
+            restaurant.setRating(restaurantDTO.getRating());
+            restaurant.setActive(restaurantDTO.isActive());
             RestaurantDTO newRestaurant = restaurantService.createRestaurant(restaurant);
             return ResponseEntity.status(HttpStatus.CREATED).body(newRestaurant); // Retorna 201 Created
         } catch (IllegalArgumentException e) {
@@ -78,8 +86,14 @@ public class RestaurantController {
      * ou status 409 Conflict se o novo nome já estiver em uso.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<RestaurantDTO> updateRestaurant(@PathVariable Long id, @RequestBody Restaurant restaurant) {
+    public ResponseEntity<RestaurantDTO> updateRestaurant(@PathVariable Long id, @Valid @RequestBody RestaurantDTO restaurantDTO) {
         try {
+            Restaurant restaurant = new Restaurant();
+            restaurant.setName(restaurantDTO.getName());
+            restaurant.setAddress(restaurantDTO.getAddress());
+            restaurant.setPhoneNumber(restaurantDTO.getPhoneNumber());
+            restaurant.setRating(restaurantDTO.getRating());
+            restaurant.setActive(restaurantDTO.isActive());
             return restaurantService.updateRestaurant(id, restaurant) // Tenta atualizar o restaurante
                     .map(ResponseEntity::ok) // Se encontrado e atualizado, retorna 200 OK
                     .orElse(ResponseEntity.notFound().build()); // Se não encontrado, retorna 404 Not Found
