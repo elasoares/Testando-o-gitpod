@@ -32,46 +32,36 @@ public class ClientService {
                 .collect(Collectors.toList());
     }
 
-    /* O uso do Optional<ClientDTO> ajuda a retornar um ClientDTO (se o ID existir no banco),
-     * Ou pode não retornar nada (se o ID não existir).
-     * É uma forma segura de evitar null e forçar quem chama o método a tratar o
-     * caso de “cliente não encontrado”.
-     * >>> This method is good for API exposure, but not for internal service logic that needs the entity. <<<
-     */
     @Transactional(readOnly = true)
-    public Optional<ClientDTO> findClientDTOById(Long id){ 
+    public Optional<ClientDTO> findClientDTOById(Long id){
         return repository.findById(id)
                 .map(ClientDTO::new);
     }
 
-
     @Transactional(readOnly = true)
-    public Optional<Client> findClientById(Long id) { 
+    public Optional<Client> findClientById(Long id) {
         return repository.findById(id);
     }
-   
 
-
-        @Transactional
-        public Optional<Client> updateClient(Long id, Client updatedClient) { 
-            return repository.findById(id)
+    @Transactional
+    public Optional<Client> updateClient(Long id, Client updatedClient) {
+        return repository.findById(id)
                     .map(client -> {
                         client.setName(updatedClient.getName());
                         client.setEmail(updatedClient.getEmail());
                         client.setPhoneNumber(updatedClient.getPhoneNumber());
 
                         if (updatedClient.getPassword() != null && !updatedClient.getPassword().isEmpty()) {
-                            client.setPassword(updatedClient.getPassword()); 
+                            client.setPassword(updatedClient.getPassword());
                         }
                         if (updatedClient.getDeliveryAddress() != null && !updatedClient.getDeliveryAddress().isEmpty()) {
                             client.setDeliveryAddress(updatedClient.getDeliveryAddress());
                         }
-                        client.setActive(updatedClient.isActive()); 
+                        client.setActive(updatedClient.isActive());
 
                         return repository.save(client);
                     });
-        }
-
+    }
 
     @Transactional
     public void initializeMockDataIfEmpty(){
@@ -110,7 +100,7 @@ public class ClientService {
         System.out.println("SERVICE: Banco H2 já possui dados cadastrados, pulando inicialização de clientes mock.");
     }
 }
-  
+
     @Transactional
     public boolean deleteClient(Long id){
         if(repository.existsById(id)){
@@ -118,7 +108,5 @@ public class ClientService {
             return true;
         }
         return false;
-
     }
-
 }

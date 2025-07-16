@@ -1,6 +1,5 @@
 package com.deliverytech.delivey_api.controller;
 
-
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -20,10 +19,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-
-
-
-
 @RequestMapping("/api/clients")
 @RestController
 public class ClientController {
@@ -33,7 +28,6 @@ public class ClientController {
         this.clientService = clientService;
     }
 
-    /* POST /clientes,  */
     @PostMapping
     public ResponseEntity<ClientDTO> createClient(@RequestBody Client client){
        try{
@@ -45,24 +39,17 @@ public class ClientController {
        }
     }
 
-    /*  GET /clientes*/
     @GetMapping
     public List<ClientDTO> listClient(){
         return clientService.findAllClients();
     }
 
-    /* , GET /clientes/{id}, */
-    
-     @GetMapping("/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ClientDTO> findClientById(@PathVariable Long id){
         return clientService.findClientById(id)
         .map(client -> new ResponseEntity<>(new ClientDTO(client), HttpStatus.OK))
         .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-    
-    /* PUT /clientes/{id}, */
-
-// In ClientController.java
 
 @PutMapping("/{id}")
 public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id, @RequestBody ClientDTO updatedDto) {
@@ -70,15 +57,12 @@ public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id, @RequestBod
     clientToUpdate.setName(updatedDto.getName());
     clientToUpdate.setEmail(updatedDto.getEmail());
     clientToUpdate.setPhoneNumber(updatedDto.getPhoneNumber());
-    
-    // 2. Call the service method with the entity
-    return clientService.updateClient(id, clientToUpdate) // Pass the clientToUpdate entity here
-            .map(updatedClient -> new ResponseEntity<>(new ClientDTO(updatedClient), HttpStatus.OK)) // Convert updated entity back to DTO
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND)); // Handle not found scenario
+
+    return clientService.updateClient(id, clientToUpdate)
+            .map(updatedClient -> new ResponseEntity<>(new ClientDTO(updatedClient), HttpStatus.OK))
+            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 }
 
-    
-    /*  DELETE /clientes/{id}   */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteClient(@PathVariable Long id){
         boolean deleted = clientService.deleteClient(id);

@@ -29,6 +29,7 @@ public class Restaurant {
     private String name;
     private String address;
     private String phoneNumber;
+    private String category;
     private Double rating; 
     private boolean active; 
 

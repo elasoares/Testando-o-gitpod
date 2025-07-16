@@ -24,17 +24,16 @@ public class CostumerOrderService {
     @Autowired
     private CostumerOrderRepository costumerOrderRepository;
     @Autowired
-    private ClientService clientService; // Para buscar clientes
+    private ClientService clientService;
     @Autowired
-    private RestaurantService restaurantService; // Para buscar restaurantes
+    private RestaurantService restaurantService;
     @Autowired
-    private ProductService productService; // Para buscar produtos e validar preços
+    private ProductService productService;
     @Autowired
-    private OrderItemRepository orderItemRepository; // Para persistir itens de pedido separadamente, se necessário
+    private OrderItemRepository orderItemRepository;
 
     @Transactional
     public CostumerOrder createOrder(CostumerOrder order) {
-        // 1. Validar Cliente e Restaurante
         Client client = clientService.findClientById(order.getClient().getId())
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
         Restaurant restaurant = restaurantService.findRestaurantById(order.getRestaurant().getId())
@@ -42,20 +41,16 @@ public class CostumerOrderService {
 
         order.setClient(client);
         order.setRestaurant(restaurant);
-        order.setStatus(OrderStatus.PENDING); // Status inicial
-        order.setOrderDate(LocalDateTime.now()); // Garante que a data seja a atual
+        order.setStatus(OrderStatus.PENDING);
+        order.setOrderDate(LocalDateTime.now());
 
         BigDecimal totalOrder = BigDecimal.ZERO;
 
-        // 2. Processar Itens do Pedido
-        // É importante que os itens sejam setados na ordem antes de salvar,
-        // ou salvos após o pedido, dependendo do CascadeType
         if (order.getItems() != null && !order.getItems().isEmpty()) {
             for (OrderItem item : order.getItems()) {
                 Product product = productService.findProductById(item.getProduct().getId())
                         .orElseThrow(() -> new RuntimeException("Produto não encontrado no item: " + item.getProduct().getId()));
 
-                // Validar se o produto pertence ao restaurante do pedido (lógica de negócio)
                 if (!product.getRestaurant().getId().equals(restaurant.getId())) {
                     throw new RuntimeException("Produto " + product.getName() + " não pertence a este restaurante.");
                 }
@@ -63,16 +58,15 @@ public class CostumerOrderService {
                     throw new RuntimeException("Produto " + product.getName() + " não está disponível.");
                 }
 
-                item.setProduct(product); // Garante que o produto é o do banco
-                item.setUnitPrice(product.getPrice()); // Define o preço do item baseado no preço atual do produto
-                item.setOrder(order); // Associa o item de volta ao pedido (essencial para o mappedBy)
+                item.setProduct(product);
+                item.setUnitPrice(product.getPrice());
+                item.setOrder(order);
 
                 totalOrder = totalOrder.add(item.getUnitPrice().multiply(new BigDecimal(item.getAmount())));
             }
         }
         order.setTotal(totalOrder);
 
-        // 3. Salvar o Pedido (os itens serão salvos em cascata devido ao CascadeType.ALL)
         return costumerOrderRepository.save(order);
     }
 
@@ -99,13 +93,11 @@ public class CostumerOrderService {
         costumerOrderRepository.deleteById(id);
     }
 
-    // Método para inicialização de dados (opcional)
     @Transactional
     public void initializeMockDataIfEmpty() {
         if (costumerOrderRepository.count() == 0) {
             System.out.println("SERVICE: Inserindo dados iniciais de Pedidos no H2...");
 
-            // Certifique-se de que clientes, restaurantes e produtos já existam
             clientService.initializeMockDataIfEmpty();
             restaurantService.initializeMockDataIfEmpty();
             productService.initializeMockDataIfEmpty();
@@ -115,20 +107,18 @@ public class CostumerOrderService {
             Product pizzaCalabresa = productService.findProductById(1L).orElseThrow(() -> new RuntimeException("Pizza Calabresa não encontrada"));
             Product cocaCola = productService.findProductById(2L).orElseThrow(() -> new RuntimeException("Coca-Cola não encontrada"));
 
-            // Criar um pedido
             CostumerOrder order1 = CostumerOrder.builder()
                     .client(joao)
                     .restaurant(pizzaria)
                     .deliveryAddress(Address.builder().street("Rua do Sol").number("10").neighborhood("Centro").city("Cidade Teste").state("TS").zipCode("12345-678").build())
-                    .build(); // O total e status serão calculados/definidos no createOrder
+                    .build();
 
-            // Adicionar itens ao pedido
             OrderItem item1_1 = OrderItem.builder().product(pizzaCalabresa).amount(1).build();
             OrderItem item1_2 = OrderItem.builder().product(cocaCola).amount(2).build();
 
-            order1.setItems(List.of(item1_1, item1_2)); // Use List.of para criar uma lista imutável
+            order1.setItems(List.of(item1_1, item1_2));
 
-            createOrder(order1); // Salva o pedido e os itens em cascata
+            createOrder(order1);
 
             System.out.println("SERVICE: Pedidos iniciais inseridos: " + costumerOrderRepository.count());
         } else {

@@ -18,6 +18,7 @@ public class RestaurantDTO {
     @NotBlank(message = "O campo telefone é obrigatório.")
     @ValidTelephone
     private String phoneNumber;
+    private String category;
     private Double rating;
     private boolean active; 
 
@@ -25,6 +26,7 @@ public class RestaurantDTO {
         this.id = restaurant.getId();
         this.name = restaurant.getName();
         this.address = restaurant.getAddress();
+        this.category = restaurant.getCategory();
         this.phoneNumber = restaurant.getPhoneNumber();
         this.rating = restaurant.getRating();
         this.active = restaurant.isActive();

@@ -21,7 +21,7 @@ import jakarta.validation.Payload;
 
 //O Constraint é a anotação mais importante para validações customizadas! 
 //Ela liga a sua @ValidTelephone à classe que realmente contém a lógica de como validar um telefone.
-@Constraint(validatedBy = ValidTelephoneValidator.class)
+@Constraint(validatedBy = ValidTeleponeValidator.class)
 
 //O Documented É uma anotação simples que indica que essa anotação deve 
 //ser incluída na documentação gerada pelo Javadoc (uma ferramenta para criar documentação de código Java)

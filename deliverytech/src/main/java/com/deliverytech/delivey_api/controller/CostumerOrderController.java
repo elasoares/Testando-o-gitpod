@@ -19,11 +19,10 @@ public class CostumerOrderController {
 
     @PostMapping
     public ResponseEntity<CostumerOrder> createOrder(@RequestBody CostumerOrder order) {
-        // Validação básica do corpo da requisição (pode ser mais robusta com @Valid)
         if (order.getClient() == null || order.getClient().getId() == null ||
             order.getRestaurant() == null || order.getRestaurant().getId() == null ||
             order.getItems() == null || order.getItems().isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // 400 Bad Request
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         CostumerOrder createdOrder = costumerOrderService.createOrder(order);
         return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
@@ -42,7 +41,7 @@ public class CostumerOrderController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PutMapping("/{id}/status") // Endpoint para atualizar apenas o status
+    @PutMapping("/{id}/status")
     public ResponseEntity<CostumerOrder> updateOrderStatus(@PathVariable Long id, @RequestParam OrderStatus status) {
         CostumerOrder updatedOrder = costumerOrderService.updateOrderStatus(id, status);
         return new ResponseEntity<>(updatedOrder, HttpStatus.OK);

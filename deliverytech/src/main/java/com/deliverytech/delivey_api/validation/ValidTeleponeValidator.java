@@ -3,7 +3,7 @@ package com.deliverytech.delivey_api.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class ValidTelephoneValidator implements ConstraintValidator<ValidTelephone, String> {
+public class ValidTeleponeValidator implements ConstraintValidator<ValidTelephone, String> {
 
     @Override
     public boolean isValid(String telefone, ConstraintValidatorContext context) {

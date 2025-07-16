@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Use Spring's Transactional
+import org.springframework.transaction.annotation.Transactional;
 
 import com.deliverytech.delivey_api.model.Restaurant;
 import com.deliverytech.delivey_api.model.RestaurantDTO;
@@ -20,29 +20,22 @@ public class RestaurantService {
     @Autowired
     private RestaurantRepository repository;
 
-    // THIS IS THE CRUCIAL METHOD FOR initializeMockDataIfEmpty()
-    // It must accept a Restaurant entity and return the saved Restaurant entity.
     @Transactional
     public Restaurant saveRestaurant(Restaurant restaurant) {
-        // Optional: Add unique name validation here if this is the primary save method
         if (repository.findByNameIgnoreCase(restaurant.getName()).isPresent()) {
             throw new IllegalArgumentException("O nome do restaurante '" + restaurant.getName() + "' já está em uso.");
         }
         return repository.save(restaurant);
     }
 
-    // The method used by ProductService to retrieve a Restaurant ENTITY
     @Transactional(readOnly = true)
-    public Optional<Restaurant> findRestaurantById(Long id) { // <--- Returns Optional<Restaurant> (ENTITY)
+    public Optional<Restaurant> findRestaurantById(Long id) {
         return repository.findById(id);
     }
 
-    // Your existing methods below:
-
     @Transactional
     public RestaurantDTO createRestaurant(Restaurant restaurant) {
-        // Can use saveRestaurant internally after validations, or keep separate
-        Restaurant savedRestaurant = saveRestaurant(restaurant); // Reuse the saving logic
+        Restaurant savedRestaurant = saveRestaurant(restaurant);
         return new RestaurantDTO(savedRestaurant);
     }
 
@@ -74,6 +67,7 @@ public class RestaurantService {
         restaurant.setAddress(updatedRestaurant.getAddress());
         restaurant.setPhoneNumber(updatedRestaurant.getPhoneNumber());
         restaurant.setRating(updatedRestaurant.getRating());
+        restaurant.setCategory(updatedRestaurant.getCategory());
 
         Restaurant savedRestaurant = repository.save(restaurant);
         return Optional.of(new RestaurantDTO(savedRestaurant));
@@ -115,10 +109,33 @@ public class RestaurantService {
     public void initializeMockDataIfEmpty() {
         if (repository.count() == 0) {
             System.out.println("SERVICE: Inserindo dados iniciais de Restaurantes no H2...");
-            // Use the saveRestaurant method that returns the entity
-            saveRestaurant(Restaurant.builder().name("Pizzaria Dev").address("Rua das Flores, 100").phoneNumber("11987654321").rating(4.8).active(true).products(new ArrayList<>()).build());
-            saveRestaurant(Restaurant.builder().name("Burger Code").address("Avenida dos Dados, 200").phoneNumber("22912345678").rating(4.5).active(true).products(new ArrayList<>()).build());
-            saveRestaurant(Restaurant.builder().name("Cantina Java").address("Travessa do Loop, 300").phoneNumber("33998765432").rating(4.2).active(false).products(new ArrayList<>()).build());
+            createRestaurant(Restaurant.builder()
+                    .name("Pizzaria Dev")
+                    .address("Rua das Flores, 100")
+                    .phoneNumber("11987654321")
+                    .category("Pizzaria")
+                    .rating(4.8)
+                    .active(true)
+                    .products(new ArrayList<>())
+                    .build());
+            createRestaurant(Restaurant.builder()
+                    .name("Burger Code")
+                    .address("Avenida dos Dados, 200")
+                    .phoneNumber("22912345678")
+                    .category("Hamburgueria")
+                    .rating(4.5)
+                    .active(true)
+                    .products(new ArrayList<>())
+                    .build());
+            createRestaurant(Restaurant.builder()
+                    .name("Cantina Java")
+                    .address("Travessa do Loop, 300")
+                    .phoneNumber("33998765432")
+                    .category("Italiana")
+                    .rating(4.2)
+                    .active(false)
+                    .products(new ArrayList<>())
+                    .build());
             System.out.println("SERVICE: Restaurantes iniciais inseridos: " + repository.count());
         } else {
             System.out.println("SERVICE: Banco de dados H2 já possui restaurantes, pulando inicialização.");
