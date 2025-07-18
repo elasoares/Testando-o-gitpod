@@ -1,0 +1,75 @@
+package com.deliverytech.delivey_api.model; 
+
+import jakarta.validation.constraints.*; 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder; // Adicione o @Builder para facilitar a criação de objetos, especialmente em testes
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder // Adicionei o @Builder para consistência e facilidade de uso
+public class RestaurantDTO {
+
+    private Long id;
+
+    @NotBlank(message = "O nome do restaurante é obrigatório.")
+    @Size(min = 2, max = 100, message = "O nome deve ter entre {min} e {max} caracteres.")
+    private String name;
+
+    @NotBlank(message = "O endereço é obrigatório.")
+    // Poderíamos adicionar validações customizadas para CEP aqui se o endereço fosse mais granular
+    private String address;
+
+    @NotBlank(message = "O telefone é obrigatório.")
+    // @Pattern(regexp = "^\\(?([1-9]{2})\\)?[-. ]?([9]{1})?([0-9]{4})[-. ]?([0-9]{4})$", message = "Formato de telefone inválido.")
+    // Ou, preferencialmente, use sua validação customizada @ValidTelefone
+    // @ValidTelefone // <-- Descomente após criar esta anotação customizada
+    private String phoneNumber;
+
+    @NotNull(message = "A avaliação é obrigatória.")
+    @DecimalMin(value = "0.0", message = "A avaliação mínima é 0.0.")
+    @DecimalMax(value = "5.0", message = "A avaliação máxima é 5.0.")
+    private Double rating;
+
+    @NotNull(message = "O status de ativo é obrigatório.")
+    private boolean active;
+
+    // --- Campos Adicionais de Validação (Baseado nas Atividades) ---
+    // Você mencionou categoria, taxa de entrega e tempo de entrega nas validações de RestauranteDTO.
+    // Se eles não existem no seu DTO atual, adicione-os aqui:
+
+    // @NotBlank(message = "A categoria do restaurante é obrigatória.")
+    // @ValidCategoria // <-- Descomente após criar esta anotação customizada para categorias permitidas
+    // private String category; // Exemplo de campo 'category'
+
+    @NotNull(message = "A taxa de entrega é obrigatória.")
+    @DecimalMin(value = "0.0", message = "A taxa de entrega não pode ser negativa.")
+    private BigDecimal deliveryFee; // Usar BigDecimal para valores monetários é uma boa prática
+
+    // Para tempo de entrega, você pode usar String e uma validação customizada
+    // ou talvez um Long/Integer para minutos.
+    @NotNull(message = "O tempo de entrega estimado é obrigatório.")
+    @Min(value = 10, message = "O tempo de entrega mínimo é {value} minutos.")
+    @Max(value = 120, message = "O tempo de entrega máximo é {value} minutos.")
+    private Integer estimatedDeliveryMinutes; // Exemplo para tempo em minutos
+
+    // Se você tiver um campo de "horário de funcionamento" como string (ex: "09:00-22:00")
+    // @ValidHorarioFuncionamento // <-- Descomente após criar esta anotação customizada
+    // private String operationHours;
+
+
+    public RestaurantDTO(Restaurant restaurant) {
+        this.id = restaurant.getId();
+        this.name = restaurant.getName();
+        this.address = restaurant.getAddress();
+        this.phoneNumber = restaurant.getPhoneNumber();
+        this.rating = restaurant.getRating();
+        this.active = restaurant.isActive();
+        // Incluir campos adicionais se eles existirem na sua entidade Restaurant
+        // this.deliveryFee = restaurant.getDeliveryFee();
+        // this.estimatedDeliveryMinutes = restaurant.getEstimatedDeliveryMinutes();
+    }
+}
