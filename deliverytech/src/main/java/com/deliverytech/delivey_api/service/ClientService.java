@@ -65,41 +65,18 @@ public class ClientService {
 
     @Transactional
     public void initializeMockDataIfEmpty(){
-    if(repository.count() == 0){
-        System.out.println("SERVICE: Clientes iniciais inseridos: " + repository.count());
+        if(repository.count() == 0){
+            System.out.println("SERVICE: Clientes iniciais inseridos: " + repository.count());
 
-        createClient(Client.builder()
-            .name("Ana")
-            .email("ana@gmail.com")
-            .password("hashed_password_ana")
-            .phoneNumber("1111-1111")
-            .deliveryAddress("Rua das Oliveiras, 10")
-            .active(true)
-            .build());
+            createClient(new Client("Ana", "ana@gmail.com", "1111-1111", "hashed_password_ana", "Rua das Oliveiras, 10", true));
+            createClient(new Client("Pedro", "pedro@gmail.com", "2222-2222", "hashed_password_pedro", "Av. Central, 250", false));
+            createClient(new Client("Elaine", "elaine@gmail.com", "3333-3333", "hashed_password_elaine", "Travessa dos Sonhos, 5", true));
 
-        createClient(Client.builder()
-            .name("Pedro")
-            .email("pedro@gmail.com")
-            .password("hashed_password_pedro")
-            .phoneNumber("2222-2222")
-            .deliveryAddress("Av. Central, 250")
-            .active(false)
-            .build());
-
-        createClient(Client.builder()
-            .name("Elaine")
-            .email("elaine@gmail.com")
-            .password("hashed_password_elaine")
-            .phoneNumber("3333-3333")
-            .deliveryAddress("Travessa dos Sonhos, 5")
-            .active(true)
-            .build());
-
-        System.out.println("SERVICE: Clientes iniciais inseridos: " + repository.count());
-    } else {
-        System.out.println("SERVICE: Banco H2 já possui dados cadastrados, pulando inicialização de clientes mock.");
+            System.out.println("SERVICE: Clientes iniciais inseridos: " + repository.count());
+        } else {
+            System.out.println("SERVICE: Banco H2 já possui dados cadastrados, pulando inicialização de clientes mock.");
+        }
     }
-}
 
     @Transactional
     public boolean deleteClient(Long id){

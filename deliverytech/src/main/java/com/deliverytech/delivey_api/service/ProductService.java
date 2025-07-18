@@ -97,33 +97,32 @@ public class ProductService {
             Restaurant mockRestaurant = restaurantService.findRestaurantById(1L)
                 .orElseGet(() -> {
                     System.out.println("SERVICE: Restaurante mock padrão (ID 1) não encontrado, criando um novo...");
-                    Restaurant newMockRestaurant = Restaurant.builder()
-                        .name("Pizzaria Dev Automática")
-                        .address("Rua dos Testes, 1")
-                        .phoneNumber("9999-1111")
-                        .rating(4.0)
-                        .active(true)
-                        .build();
+                    Restaurant newMockRestaurant = new Restaurant(
+                        "Pizzaria Dev Automática",
+                        "Rua dos Testes, 1",
+                        "9999-1111",
+                        "Pizza", // Categoria padrão
+                        4.0,
+                        true
+                    );
                     return restaurantService.saveRestaurant(newMockRestaurant);
                 });
 
-            createProduct(Product.builder()
-                .name("Pizza Calabresa Teste")
-                .description("Massa fina, calabresa, cebola, mussarela")
-                .category("Pizza")
-                .price(new BigDecimal("45.00"))
-                .available(true)
-                .restaurant(mockRestaurant)
-                .build(), mockRestaurant.getId());
+            createProduct(new Product(
+                "Pizza Calabresa Teste",
+                "Massa fina, calabresa, cebola, mussarela",
+                "Pizza",
+                new BigDecimal("45.00"),
+                true
+            ), mockRestaurant.getId());
 
-            createProduct(Product.builder()
-                .name("Refrigerante Cola Teste")
-                .description("Lata 350ml")
-                .category("Bebida")
-                .price(new BigDecimal("7.00"))
-                .available(true)
-                .restaurant(mockRestaurant)
-                .build(), mockRestaurant.getId());
+            createProduct(new Product(
+                "Refrigerante Cola Teste",
+                "Lata 350ml",
+                "Bebida",
+                new BigDecimal("7.00"),
+                true
+            ), mockRestaurant.getId());
 
             System.out.println("SERVICE: Produtos iniciais inseridos para o Restaurante: " + mockRestaurant.getName());
         } else {

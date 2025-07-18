@@ -1,7 +1,0 @@
-{
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "java.compile.nullAnalysis.mode": "automatic",
-    "yaml.schemas": {
-        "https://gitpod.io/schemas/gitpod-schema.json": "file:///workspace/Testando-o-gitpod/.gitpod.yml"
-    }
-}

@@ -109,33 +109,31 @@ public class RestaurantService {
     public void initializeMockDataIfEmpty() {
         if (repository.count() == 0) {
             System.out.println("SERVICE: Inserindo dados iniciais de Restaurantes no H2...");
-            createRestaurant(Restaurant.builder()
-                    .name("Pizzaria Dev")
-                    .address("Rua das Flores, 100")
-                    .phoneNumber("11987654321")
-                    .category("Pizzaria")
-                    .rating(4.8)
-                    .active(true)
-                    .products(new ArrayList<>())
-                    .build());
-            createRestaurant(Restaurant.builder()
-                    .name("Burger Code")
-                    .address("Avenida dos Dados, 200")
-                    .phoneNumber("22912345678")
-                    .category("Hamburgueria")
-                    .rating(4.5)
-                    .active(true)
-                    .products(new ArrayList<>())
-                    .build());
-            createRestaurant(Restaurant.builder()
-                    .name("Cantina Java")
-                    .address("Travessa do Loop, 300")
-                    .phoneNumber("33998765432")
-                    .category("Italiana")
-                    .rating(4.2)
-                    .active(false)
-                    .products(new ArrayList<>())
-                    .build());
+            
+            createRestaurant(new Restaurant(
+                "Pizzaria Dev",
+                "Rua das Flores, 100",
+                "11987654321",
+                "Pizzaria",
+                4.8,
+                true
+            ));
+            createRestaurant(new Restaurant(
+                "Burger Code",
+                "Avenida dos Dados, 200",
+                "22912345678",
+                "Hamburgueria",
+                4.5,
+                true
+            ));
+            createRestaurant(new Restaurant(
+                "Cantina Java",
+                "Travessa do Loop, 300",
+                "33998765432",
+                "Italiana",
+                4.2,
+                false
+            ));
             System.out.println("SERVICE: Restaurantes iniciais inseridos: " + repository.count());
         } else {
             System.out.println("SERVICE: Banco de dados H2 já possui restaurantes, pulando inicialização.");

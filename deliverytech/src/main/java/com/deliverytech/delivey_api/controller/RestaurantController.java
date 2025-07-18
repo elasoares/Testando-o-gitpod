@@ -31,7 +31,7 @@ public class RestaurantController {
             restaurant.setName(restaurantDTO.getName());
             restaurant.setAddress(restaurantDTO.getAddress());
             restaurant.setPhoneNumber(restaurantDTO.getPhoneNumber());
-            restaurant.setCategory(restaurantDTO.getCategory()); // Adicionado o category aqui
+            restaurant.setCategory(restaurantDTO.getCategory()); 
             restaurant.setRating(restaurantDTO.getRating());
             restaurant.setActive(restaurantDTO.isActive());
             RestaurantDTO newRestaurant = restaurantService.createRestaurant(restaurant);

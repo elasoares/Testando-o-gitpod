@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList; 
 
 @Service
 public class CostumerOrderService {
@@ -47,7 +48,9 @@ public class CostumerOrderService {
         BigDecimal totalOrder = BigDecimal.ZERO;
 
         if (order.getItems() != null && !order.getItems().isEmpty()) {
-            for (OrderItem item : order.getItems()) {
+            List<OrderItem> currentOrderItems = new ArrayList<>(order.getItems()); 
+
+            for (OrderItem item : currentOrderItems) {
                 Product product = productService.findProductById(item.getProduct().getId())
                         .orElseThrow(() -> new RuntimeException("Produto não encontrado no item: " + item.getProduct().getId()));
 
@@ -60,7 +63,8 @@ public class CostumerOrderService {
 
                 item.setProduct(product);
                 item.setUnitPrice(product.getPrice());
-                item.setOrder(order);
+                item.setOrder(order); 
+                order.getItems().add(item);
 
                 totalOrder = totalOrder.add(item.getUnitPrice().multiply(new BigDecimal(item.getAmount())));
             }
@@ -107,16 +111,25 @@ public class CostumerOrderService {
             Product pizzaCalabresa = productService.findProductById(1L).orElseThrow(() -> new RuntimeException("Pizza Calabresa não encontrada"));
             Product cocaCola = productService.findProductById(2L).orElseThrow(() -> new RuntimeException("Coca-Cola não encontrada"));
 
-            CostumerOrder order1 = CostumerOrder.builder()
-                    .client(joao)
-                    .restaurant(pizzaria)
-                    .deliveryAddress(Address.builder().street("Rua do Sol").number("10").neighborhood("Centro").city("Cidade Teste").state("TS").zipCode("12345-678").build())
-                    .build();
+            Address deliveryAddress1 = new Address("Rua do Sol", "10", "Centro", "Cidade Teste", "TS", "12345-678");
 
-            OrderItem item1_1 = OrderItem.builder().product(pizzaCalabresa).amount(1).build();
-            OrderItem item1_2 = OrderItem.builder().product(cocaCola).amount(2).build();
+            CostumerOrder order1 = new CostumerOrder();
+            order1.setClient(joao);
+            order1.setRestaurant(pizzaria);
+            order1.setDeliveryAddress(deliveryAddress1);
 
-            order1.setItems(List.of(item1_1, item1_2));
+            OrderItem item1_1 = new OrderItem();
+            item1_1.setProduct(pizzaCalabresa);
+            item1_1.setAmount(1);
+
+            OrderItem item1_2 = new OrderItem();
+            item1_2.setProduct(cocaCola);
+            item1_2.setAmount(2);
+
+            List<OrderItem> itemsForOrder1 = new ArrayList<>();
+            itemsForOrder1.add(item1_1);
+            itemsForOrder1.add(item1_2);
+            order1.setItems(itemsForOrder1); 
 
             createOrder(order1);
 
